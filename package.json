@@ -1,0 +1,7 @@
+{
+  "name": "website",
+  "version": "1.0.0",
+  "dependencies": {
+    "parse5-html-rewriting-stream": "^6.0.0"
+  }
+}

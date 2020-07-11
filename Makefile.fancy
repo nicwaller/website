@@ -1,0 +1,30 @@
+.PHONY: build
+build: _site
+
+HTML_FILES=$(wildcard src/*.html)
+META_FILES=$(patsubst src/%.html, _site/%.meta.json, $(HTML_FILES))
+
+_site: src/*.html $(META_FILES) keywords
+	@rsync -a src/ _site/
+
+_site/%.meta.json: src/%.html test.js
+	<$< node test.js - > $@
+
+node_modules: package.json
+	npm install
+
+keywords: $(META_FILES)
+	mkdir -p keywords
+	jq -r '.keywords[]' _site/*.meta.json | sort | uniq | sed -Ee 's|(.*)|keywords/\1.mark|' | xargs touch
+
+keywords/%.txt: keywords keywords/%.mark $(META_FILES)
+	jq -r '.keywords[] | select (. == "$*") | input_filename' _site/*.meta.json | sed -e 's/.meta.json/.html/' > $@
+
+forever:
+	while true; do make build --silent; sleep 1; done
+
+serve: _site
+	@cd _site && python3 -m http.server 8000
+
+dev:
+	(trap 'kill 0' SIGINIT; make forever & make serve)

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Cool tricks and pro tips and gems in the rough</title>
+    <include src="/fragment/head.html" />
+</head>
+<body>
+
+<include src="/fragment/nav.html" />
+
+<main>
+
+    <section>
+        Run two jobs in parallel in bash without any extra dependencies.
+        <pre><code>
+    (trap 'kill 0' SIGINT; prog1 & prog2 & prog3)
+</code></pre>
+        Via Stack Overflow <a
+            href="https://stackoverflow.com/a/52033580/190298">https://stackoverflow.com/a/52033580/190298</a>
+
+        TODO: awk one-liner that does uniq without requiring sort
+
+        If you're running a Linux VM under Parallels for macOS make sure to turn off all resource limiting, otherwise network bandwidth is capped absurdly low at like 400 KB/sec.
+
+        If you use Firefox but hate the new HUGE MEGA BAR introduced in 75, you can tweak it down modding userChrome.css.
+        <a href="https://www.userchrome.org/megabar-styling-firefox-address-bar.html#mbarstyler">megabar styler</a>
+
+        For me, this is all it took to make it less offensive.
+        <pre>
+        --mbarstyler-popout-pixels: 7px;
+        --mbarstyler-popout-pixels: 0px;
+        </pre>
+
+        Firefox multiple account containers
+
+        BitBar for macOS - seriously powerful customization
+
+        https://www.mediaatelier.com/CheatSheet/
+
+        querying RDAP servers
+        <pre>
+            docker run nicwaller/nicinfo:latest random.surf
+        </pre>
+
+        PingDoctor or PingPlotter
+
+        General fun:
+
+        https://userinyerface.com/ User Inyerface - A worst-practice UI experiment
+
+        <a href="https://academo.org/demos/virtual-oscilloscope/">
+            Virtual Oscilloscope
+        </a>
+
+        <a href="https://audiomass.co/">AudioMass</a> in-browser audio editor
+
+        PhotoPea online photo editor
+    </section>
+
+    <a href="https://cirw.in/blog/bracketed-paste">vim Bracketed paste mode</a>
+
+    <a href="https://blog.plover.com/prog/Moonpig.html#testing-sucks">
+        Collapsing/parameterizing the time dimension in unit tests
+    </a>
+
+    <a href="https://appleserialnumberinfo.com/Desktop/index.php">
+        Decode serial numbers of Apple Computers
+    </a>
+
+</main>
+
+<include src="/fragment/footer.html" />
+</body>
+</html>

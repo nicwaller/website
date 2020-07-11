@@ -1,0 +1,22 @@
+html {
+    font-family: sans-serif;
+}
+
+section {
+    margin-top: 1em;
+    margin-bottom: 3em;
+}
+
+img.centre {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 1em;
+}

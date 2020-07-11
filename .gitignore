@@ -1,0 +1,7 @@
+_site
+node_modules
+.idea/*
+keywords
+
+# assets are sent to AWS S3 instead
+assets
