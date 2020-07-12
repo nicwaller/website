@@ -1,5 +1,14 @@
 html {
     font-family: sans-serif;
+    min-width: 20em;
+    max-width: 40em;
+    width: 80%;
+
+    padding-bottom: 4em;
+}
+
+a {
+    line-height: 10mm;
 }
 
 section {
@@ -14,6 +23,8 @@ img.centre {
 }
 
 footer {
+    background-color: white;
+    opacity: 90%;
     position: fixed;
     left: 0;
     right: 0;
