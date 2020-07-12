@@ -25,9 +25,5 @@ img.centre {
 footer {
     background-color: white;
     opacity: 90%;
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
     padding: 1em;
 }
