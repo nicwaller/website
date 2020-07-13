@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Cool things I wish existed</title>
+    <!--suppress CheckEmptyScriptTag -->
+    <include src="/fragment/head.html" />
+</head>
+<body>
+
+<!--suppress CheckEmptyScriptTag -->
+<include src="/fragment/nav.html" />
+
+<main>
+
+    <section>
+        <h1>IMAP Instant Messenger</h1>
+        One of the worst things about email is signatures and
+        <a href="https://en.wikipedia.org/wiki/Salutation">salutations</a>.
+        Another terrible thing is HTML content obscuring the actual message.
+        Maybe we should strip email back to the bare minimum, make it real-time,
+        and use it as a protocol for instant messaging. Of course, it would be
+        backward compatible with email so you can still communicate with everyone
+        you need to reach. But maybe some additional features are available when
+        both sides are using IMAP Instant Messenger (IMIM). This would also fix
+        the problem of the conversation not appearing linearly, partly due to
+        the messed-up way that people format replies which is exacerbated by
+        signatures and salutations.
+    </section>
+
+    <section>
+        <h1>IMAP Agent</h1>
+        What good is an email client that doesn't help you read any email?
+        When I was listening to <a href="https://www.relay.fm/mpu/539">Mac Power
+        Users #539 - Back to Email</a> I started thinking it might be super useful
+        to have a stripped down IMAP client where the sole purpose is executing
+        rules (filtering, etc.). Sure, Gmail gives you the ability to perform some
+        basic filtering, but you can't do any complex operations. You can't even
+        unconditionally forward email! Imagine having much more power, extensible
+        with local programming and shell scripts. Being able to run it in AWS ECS
+        or Lambda would be one thing, but running it locally at home could allow
+        even cooler "smart home" interactions based on email. And for IMAP servers
+        that don't have great rules processing, you can kind of add that function.
+        Perhaps this could even be used to act as an "agent" of the user, automating
+        and performing more complex actions that users might take.
+    </section>
+
+    <section>
+        <h1><code>less</code> for HTTP</h1>
+        Less, for large HTTP-addressable objects (including AWS S3)
+        Progressive loading and viewing of very large files
+        And progressive listing of very large directories.
+        Text, multiple encodings, mine type, and hex viewer
+    </section>
+
+    <section>
+        <h1>AXIS IP sender</h1>
+        AXIS IP cameras record video to local storage, which is hard to access remotely.
+        They can send still images over HTTP, but those are hard to work with.
+        Imagine if there was a cool HTTP endpoint that could receive images from an AXIS
+        IP camera and group them into sequences and render them into video or animated
+        GIFs and identify the interesting keyframes and then trigger Slack integrations
+        or whatever else.
+    </section>
+
+    <section>
+        <h1>Sharegeo</h1>
+        Just a simple website that allows you to share your location with other people.
+        Either one quick share, or for a longer period of time. Like activities of a couple
+        hours up to a day, semi-realtime sharing of location. So you could have like a group
+        bike ride and see where everyone is. Or even longer-term recording, so you can record
+        your trip through countries and so on. And then provide people with their own GPX
+        if they want it. And also use end-to-end encryption to implement a zero-trust solution
+        that makes it impossible for the server to see the actual location data that is being
+        sent between clients.
+
+        This is related to my other idea for an Open GPX tracker.
+
+        A Strava-like fitness tracking app that sends your GPX to a custom webhook or email address.
+
+    </section>
+
+    <section>
+        <h1><a href="https://www.http.health">http.health</a></h1>
+        <ul>
+            <li>Content base checks</li>
+            <li>Positive and negative tests</li>
+            <li>Custom response codes</li>
+            <li>HTTP authentication</li>
+            <li>TLS certificate expiration checking</li>
+            <li>Expose the health endpoint for the service itself</li>
+            <li>￼ escalate to SMS and phone call because iOS limits on push notifications</li>
+            <li>Oauth workflow</li>
+            <li>S3 Bucket privacy</li>
+            <li>Multiple AWS regions</li>
+            <li>SLA breach events</li>
+            <li>Custom time window for evaluation of uptime availability</li>
+            <li>RSS feed</li>
+            <li>Slack integration</li>
+            <li>Dead man switch checking aka heartbeat or push check</li>
+            <li>Repeating alerts</li>
+            <li>API key for...</li>
+            <li>Terraform provider</li>
+            <li>Read only API key</li>
+            <li>Custom status page, different internal and external names</li>
+            <li>Notes field or runbook URL</li>
+            <li>Email alerting</li>
+            <li>Precedence and roll up during major events</li>
+            <li>Maintenance window</li>
+            <li>Like pingdom but better</li>
+        </ul>
+    </section>
+
+    <section>
+        <h1>RDAP-whois for iOS/Android</h1>
+        RDAP is a protocol that's like WHOIS but better and easier to implement.
+        I bet I could make a really nice domain lookup app for iOS.
+    </section>
+
+    <section>
+        <h1>STV .BLT file analyzer</h1>
+        .BLT ballot file analyzer
+    </section>
+
+</main>
+
+<!--suppress CheckEmptyScriptTag -->
+<include src="/fragment/footer.html" />
+</body>
+</html>
