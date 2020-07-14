@@ -1,30 +1,73 @@
 <!DOCTYPE html>
+<!--suppress CheckEmptyScriptTag -->
 <html lang="en">
 <head>
     <title>Musings on notifications</title>
-    <!--suppress CheckEmptyScriptTag -->
     <include src="/fragment/head.html" />
 </head>
 <body>
 
-<!--suppress CheckEmptyScriptTag -->
 <include src="/fragment/nav.html" />
 
 <main>
 
-    Notifications
-    As Inter process events
-    That can be intercepted and dispatched by agents acting on behalf of the user
-    The user choose s what to see
-    And when to see it
-    And avoids stupid config like "only sounds"
-    What if growl?
-    And Apple events?
-    Attention theft
+    Notifications are one pattern of "attention theft".
+
+    <section>
+        <h1>Notifications vs. Pick-Ups</h1>
+
+        <p>Managing notifications isn't just only about the signal to noise ratio and when to get notifications or not to get them but also is about balancing these push versus pole where sometimes￼￼</p>
+
+        <p>If all the notifications are turned off and people may be driven to check their phones or open their phones or pick up their phones more often in order to check to see if new content has arrived because no notifications were delivered</p>
+
+        <p>And then can become a gambling type activity where there are occasional rewards which reinforces the checking behaviour</p>
+
+        <p>So the problem of silence in notifications is not just with notifications but is also about reducing spontaneous pick ups</p>
+    </section>
+
+    <section>
+        <h1>Notifications & Agents</h1>
+        Right now, people have very little control over their notifications, even less control than they had over email.
+        You can allow or block a sender, but you can't allow or block specific messages from a sender.
+        And now that Apple officially allows and supports sending advertisements with push notifications,
+        it's getting worse on both iOS and macOS.
+
+        So here's a different vision for macOS:
+
+        - Imagine a system-wide pubsub server for notifications
+        - Any process can generate notification content
+        - The user can register whatever agent they want to display those notifications
+        - The agent could do things like batch notifications in time
+        - Or filter out spam
+        - Or do local machine learning to see what really interests people
+        - The point is about moving control back to the user
+    </section>
+
+    <section>
+        <h1>Notifications on iOS</h1>
+
+        <p>Sounds -- auditory or vibrational stimulus to attract my attention away from other pursuits. If sounds are on, it should be paired with something sticky, ideally lock screen.</p>
+
+        <p>Lock screen -- visual stimulus to turn on lock screen for 8 seconds. Also so I can quickly decide whether to use the phone without going into it.</p>
+
+        <p>Notification centre -- I've already decided to use the phone, and I want to see what else I might have missed. This is a problem area because there is no way of seeing whether the centre has content, so I end up checking it frequently.</p>
+
+        <p>Badges -- like notification centre, but provides a visual indication. Trouble is when I end up scrolling back and forth through pages looking for that red dot. Maybe limit badges to docked apps, or home screen apps, not to apps relegated to deeper pages.</p>
+
+        <p>Banners -- provides an optional diversion, but only when I'm already using the phone.</p>
+
+        <p>I guess this is why lock screen always felt weird. Because lock screen operates both as a low barrier inbox and as a notifier using only light. And to further complicate things the lock screen setting also has privacy implications.</p>
+
+        <p>And the notification Centre can only be accessed by for a visit in the home screen which means that badges will be visible too, if only for a moment.</p>
+
+    </section>
+
+    Further reading:
+
+    https://humanetech.com
 
 </main>
 
-<!--suppress CheckEmptyScriptTag -->
 <include src="/fragment/footer.html" />
 </body>
 </html>
