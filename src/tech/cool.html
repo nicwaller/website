@@ -1,13 +1,12 @@
 <!DOCTYPE html>
+<!--suppress CheckEmptyScriptTag -->
 <html lang="en">
 <head>
     <title>Cool things I wish existed</title>
-    <!--suppress CheckEmptyScriptTag -->
     <include src="/fragment/head.html" />
 </head>
 <body>
 
-<!--suppress CheckEmptyScriptTag -->
 <include src="/fragment/nav.html" />
 
 <main>
@@ -73,10 +72,13 @@
         that makes it impossible for the server to see the actual location data that is being
         sent between clients.
 
-        This is related to my other idea for an Open GPX tracker.
-
+        This is related to my other idea for an Open GPX tracker:
         A Strava-like fitness tracking app that sends your GPX to a custom webhook or email address.
 
+        Also related to my other GPS idea:
+        I want to map out how good/bad my cell service is along the skytrain route, and
+        use that to go hassle my cell phone provider. (Except it turns out that GPS inside tunnels
+        is also unreliable... so probably a lot of data massage needed.)
     </section>
 
     <section>
@@ -121,9 +123,44 @@
         .BLT ballot file analyzer
     </section>
 
+    <section>
+        <h1>Failure-in-a-can</h1>
+        The worst behaved app ever, for testing infrastructure.
+        Customize failure with command line arguments or a config file.
+        Distributed as a pre-made docker container on hub
+    </section>
+
+    <section>
+        <h1>Slack add-ons</h1>
+        <ul>
+            <li>Remove unused emoji</li>
+            <li>Capture logs (even from free organizations!)</li>
+            <li>Identify channels that are mostly redundant based on similar audience groups.</li>
+            <li>Reminder when sun is at a certain position in the sky, so that it lines up
+            with roads or streets, that way you can leave the office for a few minutes to glimpse
+            then sun instead of it always being hidden behind skyscrapers.</li>
+            <li>Webhook filter. Add footer that allows unsubscribe, modify, assign?
+                Can bundle and delay messages
+                Rate limiting
+                Addressing specific users based on rules
+                Temporary transient mute rules
+                Routine announcements about quantity of muted messages
+                Mirror to a different system
+                Implement as a Lambda
+                Add comments to kinds of events
+            </li>
+        </ul>
+    </section>
+
+    <section>
+        <h1>AWS add-ons</h1>
+        <ul>
+            <li>Estimated GHG and energy impact based on AWS historic billing data</li>
+        </ul>
+    </section>
+
 </main>
 
-<!--suppress CheckEmptyScriptTag -->
 <include src="/fragment/footer.html" />
 </body>
 </html>
