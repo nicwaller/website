@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<!--suppress CheckEmptyScriptTag -->
+<html lang="en">
+<head>
+    <title>AWS Lessons</title>
+    <include src="/fragment/head.html" />
+</head>
+<body>
+
+<include src="/fragment/nav.html" />
+
+<main>
+
+    <h1>AWS Lessons</h1>
+
+    <section>
+        <h2>Multiple Accounts</h2>
+        <h3>Avoid overlapping resources</h3>
+        Many resources in AWS can be freely provisioned without worrying about overlap.
+        But some resources require you to pick names that are unique to the AWS account.
+        So if you have multiple environments in one AWS account, you'll have to carefully
+        manage the names of everything in all of these services:
+        <ul>
+            <li>IAM (users, policies, roles)</li>
+            <li>S3 (bucket names, globally unique)</li>
+            <li>CloudFront (globally unique, I think?)</li>
+        </ul>
+
+        <!--        TODO: Why use multiple accounts? Exactly why? What worked well? Trade-offs?-->
+    </section>
+
+    <section>
+        <h2>Misaligned timestamps in the AWS Console</h2>
+        Some services present timestamps in browser time, others in UTC. Correlation is a huge pain.
+
+        Workaround 1: Set your system time to UTC, and now all timestamps in AWS are consistent.
+        You can still run an alternate clock in your menubar that still shows the local time.
+
+        This menubar app is invaluable for dealing with inconsistent and braindead timestamps in AWS Console.
+        https://apps.apple.com/ca/app/clocker/id1056643111?mt=12
+    </section>
+
+    <section>
+        <h2>Site-to-Site VPN (AWS VPC)</h2>
+        Okay, so the Site-to-Site VPN feature in AWS VPC is honestly just kinda bad.
+
+        <h3>Troubleshooting is nigh-impossible</h3>
+        Furthermore, AWS-managed VPN gives us basically no troubleshooting tools to identify the problem -- we have to rely entirely on our partners.
+        The best I can do is watch some CloudWatch metrics with 1 minute resolution.
+
+        <h3>Limited SA pairs</h3>
+        <blockquote>
+            Note: AWS accepts only a single pair of security associations for a VPN connection (one inbound and one outbound association)
+            <a href="https://aws.amazon.com/premiumsupport/knowledge-center/vpn-tunnel-troubleshooting/">(source)</a>
+        </blockquote>
+
+        So if you're trying to link with a partner that wants to expose more than one subnet,
+        especially two different hosts in wildly different subnets,
+        there is a moderately good chance they'll try to use multiple security associations,
+        and then you'll only ever be able to receive traffic from one of them.
+
+        The workaround is to ask your partner to use route-based VPN on a vti.
+
+        The real solution is to use a "real" VPN device like Cisco ASA or Palo Alto or whatever.
+        Maybe even pfSense or StrongSwan would do better.
+
+        <h3>Only accepts FIRST cipher proposal</h3>
+        AWS apparently has a buggy implementation of their IPsec site-to-site VPN
+        such that when a remote party (eg. Cisco ASA) is the initiator
+        (NOTE: the remote party is ALWAYS the initiator)
+        AWS will select the first cipher proposal instead of the best match.
+        This causes Phase 1 negotiation to fail even if there are matching cipher suites available.
+
+        This means that as long as we are using AWS VPN,
+        we must tell our VPN partners that they have to configure a single cipher proposal.
+    </section>
+
+    <section>
+        <h2>Network Load Balancer (EC2)</h2>
+        <h3>No ICMP Echo (Ping)</h3>
+        It is apparently impossible to ping an AWS Network Load Balancer.
+        It won't respond on its own, and downstream targets don't have the option to reply to ICMP ping.
+        This is a huge annoyance if you're using NLB with VPN, because VPN should have a ping-able target for keepalive.
+
+        <blockquote>
+            ICMP requests other than Type 3 are also considered unintended traffic.
+            Network Load Balancers drop unintended traffic without forwarding it to any targets.
+            <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-listeners.html">(source)</a>
+        </blockquote>
+
+        <h3>No Security Groups</h3>
+        Network Load Balancers (NLB) do not have security groups.
+        CIDR-based access policy is actually dictated by the targets of the NLB.
+
+        <h3>Limited Re-use</h3>
+        Compared to an ALB with HTTP, network load balancers are not very reusable.
+        HTTP 1.1 with Host headers and SNI allows multiple services to be fronted by a single ALB, awesome.
+        But with an NLB, you get one application per port. THAT'S ALL.
+
+        This gets even worse when you start mixing NLB with VPN connections.
+    </section>
+
+    <section>
+        <h2>Compute Instances (EC2)</h2>
+        <h3>UserData limited to 16384 bytes</h3>
+        If you're building immutable instances with EC2 Userdata, beware.
+        Especially applies if you're populating a lot of SSH authorized_keys files.
+
+        <blockquote>
+            aws_instance.bastion: Error launching source instance: InvalidParameterValue: User data is limited to 16384 bytes
+        </blockquote>
+
+        Workaround: keep using Userdata, but copy large files from S3.
+        Workaround: prepare your images using Packer.
+
+        <h3>IMDS Instance metadata is risky</h3>
+        TL;DR any software running on an EC2 instance with IMDSv1 can obtain AWS IAM credentials of the EC2 instance in the context of the owning AWS organization with a simple GET request. 😱
+
+        IMDSv2 protects that resource by requiring an HTTP PUT before GET, which makes it much harder to abuse because most paths to abuse come through GET requests.
+    </section>
+
+    <section>
+        <h2>Application Load Balancer (EC2)</h2>
+        <h3>Hard to log content of failed requests</h3>
+        No easy way to log failed requests to an ALB (4xx/5xx).
+        You would need to mirror all traffic somewhere else
+        And also set up detailed ALB logging
+        And probably also VPC flow logs
+        Then write something that could match up all of those together
+        And do it quickly to avoid retaining a flood of data.
+
+        AWS Support will tell you to do this yourself.
+    </section>
+
+    <section>
+        <h2>Identity & Access Management (IAM)</h2>
+        <h3>API keys are insecure by default</h3>
+        By default, aws-sdk looks for your API keys in <code>~/.aws/credentials</code>.
+        Dangerous! Because ANY process running in your user account can read that file.
+        Anything you download or run from the internet could easily exfiltrate that API key.
+        Your AWS API key can be leaked by any software you install on your Mac.
+
+        <em>Workaround:</em> <a href="https://github.com/99designs/aws-vault">aws-vault</a>
+        is very good. Definitely want to be using this for anyone who has highly
+        privileged access to AWS, and probably also for anyone who uses an IAM key at all.
+
+        Workaround: macOS 10.15 Catalina introduces new restrictions on file system access that makes it
+        more difficult for malware to go digging through the hard drive for interesting gems like AWS keys.
+        We could probably add another layer of defense in depth by upgrading to 10.15 Catalina
+        and moving our AWS keys (and other secrets?) into the ~/Documents/ folder.
+
+        <h3>Self Control</h3>
+        There's no built-in policy that allows users to manage their own MFA, password, etc.
+        <!-- TODO: upload my self-control policy -->
+
+        <h3>Read-Only is Dangerous</h3>
+        The read-only policy allows read access to contents of all buckets.
+        If any of your data is sensitive, you should never grant read-only.
+        What you USUALLY want is my structure-viewer policy.
+        <!-- TODO: upload my structure-viewer policy -->
+
+        <h3>AssumeRole is awesome</h3>
+        AssumeRole changes out your current set of privileges for a different set.
+        Importantly, they are not cumulative -- you shed your earlier privileges.
+        Processes that will be handling sensitive info can run as weaker roles.
+        (It would be even cooler if a process could downgrade its own role at runtime)
+
+        <h3>AssumeRole makes CloudTrail logs confusing</h3>
+        The thing I hate most about AWS CloudTrail and IAM...
+        Is that when you assume a role and perform actions under that assumed role,
+        your original identity is discarded in most stores and views.
+
+        AWS pro tip:
+        <a href="https://stackoverflow.com/a/62096435/190298">find the person who assumed a session</a>
+        https://stackoverflow.com/questions/62096052/identify-aws-iam-user-that-assumed-an-iam-role/62096435#62096435
+
+        <h3>Use MFA to Assume Roles</h3>
+        As much as possible, you definitely want to require MFA for assuming roles
+        Especially for use with an API key
+        Because API keys are just too dangerous on their own, otherwise.
+        This matters for things like Terraform.
+
+        <h3>Key Pattern</h3>
+        Some API keys follow a distinct format which allows us to do really cool stuff
+        like this, without needing to buy GitGuardian or whatever. Find AWS API keys:
+        <code>ag -lw 'AKIA[A-Z0-9]{16}'</code>
+
+        <h3>aws-sdk and aws-cli don't load named profiles</h3>
+        If you’re using aws-sdk, wanting to test locally,
+        and using Named Profiles to assume IAM roles,
+        then both these environment variables are required:
+        AWS_SDK_LOAD_CONFIG=true AWS_PROFILE=your-whatever-profile
+
+        AWS_SDK_LOAD_CONFIG says “hey, use my ~/.aws/config instead of searching for http://169.254.169.254”
+        AWS_PROFILE says which profile to load from there
+    </section>
+
+    <section>
+        <h2>ChatBot</h2>
+        You can use AWS ChatBot to pipe findings from GuardDuty directly into Slack. 😎
+
+        It can also be set up to subscribe to messages that flow through SNS. Chatbot knows how to format messages from any of these origins:
+        - Amazon CloudWatch Alarms ￼
+        - Amazon CloudWatch Events (might be very cool 😎)
+        - Notifications for AWS developer tools (????)
+        - AWS CloudFormation 🤷‍♂️
+        - AWS Billing and Cost Management  🕴️💰
+
+        <h3>Cannot send CloudWatch AlarmDescription</h3>
+        I was experimenting with using AWS ChatBot to deliver CloudWatch alarms into Slack.
+        Unfortunately, ChatBot does not forward the AlarmDescription.
+        I like using AlarmDescription to include a runbook URL for each alarm.
+        And the output from Chatbot cannot be customized at all.
+    </section>
+
+    <section>
+        <h2>S3</h2>
+        <h3>Use README files</h3>
+        Put a README.txt file in the root of each bucket. Use this to express intent.
+        <ul>
+            <li>Are the contents of this bucket managed by human or machine?</li>
+            <li>Are you expecting sensitive (PII, PHI, PCI) data in this bucket?</li>
+            <li>How bad is it if all this data goes missing?</li>
+        </ul>
+        You'll thank yourself later.
+
+        <h3>Surprising auto-decompression</h3>
+        If you're using aws-sdk, or any software that uses aws-sdk, then any files that
+        are compressed in AWS S3 will be automatically decompressed when you receive them.
+        But headers and filenames remain unchanged. So you might think you have a compressed
+        file, but actually you don't. And I don't think there's any way to retrieve the
+        compressed representation using aws-sdk.
+
+        I ran into this bug with Transmit.app for macOS -- files that are compressed in S3
+        are downloaded to my Mac as uncompressed. I reported this bug to Panic.
+
+        I also ran into this bug with Elastic FileBeat -- it crashed trying to ingest
+        compressed files, because it attempted a second round of decompression.
+        <!-- TODO: add link to bug report on GitHub -->
+    </section>
+
+    <section>
+        <h2>EventBridge</h2>
+        EventBridge is super cool, but I already found my first annoyance.
+        <code>
+            export interface SNSNotificationV1 {
+            EventSource: 'aws:sns',
+            ...
+
+            export interface S3EventV2 {
+            eventSource: 'aws:s3';
+            ...
+        </code>
+        Why not use the same casing? ￼ This is an AWS problem. I just had to write code to navigate around it.
+    </section>
+
+    <section>
+        <h2>KMS</h2>
+        KMS is just super hard, honestly. It'll get'ya every time.
+        https://devops.stackexchange.com/q/11623/7770
+
+        <h3>Avoid Orphaned Keys</h3>
+        Beware the minimal required KMS key policy.
+        Unlike other AWS services, KMS access is <mark>not automatically granted</mark> to any entity.
+        So if you don't grant access to yourself, it becomes orphaned.
+    </section>
+
+    <section>
+        <h2>CloudTrail</h2>
+        CloudTrail is mostly useless for troubleshooting.
+        First, because there's like a 5 minute delay for logs to arrive in CloudTrail.
+        Second, because it has NEVER been able to answer my question of
+        "why did I get AccessDenied on this API call?"
+        Trying to use CloudTrail to write IAM policy is an exercise in futility.
+    </section>
+
+    <section>
+        <h2>CloudFront</h2>
+        <h3>Logs are Delayed</h3>
+        There's always a 0-5 minute delay on ingesting CloudFront logs
+        because they're written direct to S3 on an AWS-specified schedule.
+
+        Proposed Alternative:
+        If we really wanted to get those faster, we could generate our own logs with a Lambda@Edge function.
+
+        <h3>No HSTS</h3>
+        AWS CloudFront does not natively support addition of HSTS Strict-Transport-Security headers.
+
+        Workaround:
+        Looks like the only way to do this with AWS CloudFront is by using Lambda@Edge.
+        https://forums.aws.amazon.com/thread.jspa?threadID=162252
+        I still need to investigate the possible impact on performance and reliability.
+    </section>
+
+    <section>
+        <h2>Elastic Container Service (ECS)</h2>
+        <h3>IAM roles on Tasks, not Services</h3>
+        Normally you want to assign IAM role to a Task, not a Service.
+
+        ECS Services can carry IAM roles if AND ONLY IF they are also configured with a load balancer.
+
+        <h3>Dangerous with auto-scaling groups</h3>
+        Your services will get nuked without warning, ungracefully.
+        The only solution I know of so far is to install a custom Lambda lifecycle event handler. ￼
+        https://aws.amazon.com/blogs/compute/how-to-automate-container-instance-draining-in-amazon-ecs/
+    </section>
+
+    <section>
+        <h2>Kinesis</h2>
+        <h3>Data stuck in the stream</h3>
+        There’s some data stuck in a Kinesis stream that’s going to expire in about 18 hours. I want it. It’s possible to re-read old events from a Kinesis stream, but…
+
+        If you don’t know the exact time the events start, you need to slowly scroll forward from the oldest time available until you encounter records. Until you find the right place, it will just keep returning Records: []. This can take 20-60 round trips through the API. ￼  It’s a real, known issue. Actually it’s the “expected” behaviour.
+        https://stackoverflow.com/a/38579528/190298
+        https://forums.aws.amazon.com/thread.jspa?messageID=509980
+    </section>
+
+    <section>
+        <h2>Parameter Store (SSM)</h2>
+        The longest value that can be stored in AWS SSM Parameter Store is 4096 bytes.
+    </section>
+
+    <section>
+        <h2>API Gateway</h2>
+        Managing AWS API Gateway in AWS Console is still awful.
+        API Gateway with Terraform is still unworkable.
+        The only half-pleasant experience I've had with API Gateway was with the Serverless framework.
+    </section>
+
+    <section>
+        <h2>Web App Firewall (WAF)</h2>
+        WAF detected nothing abnormal during the pentest, and this result surprises me.
+        We have it configured to detect and halt SQL injection attacks,
+        and I expected the automated scanners used by our testers to trigger this rule.
+        But it detected zero events during the testing period.
+        The filter sensitivity is a lot lower than I expected.
+
+        <h3>Two Worlds Apart</h3>
+        AWS WAF (Web Application Firewall) introduced a new console.
+        (Fair enough, AWS likes to do that from time to time.)
+        But the new console doesn't show old resources. Old resources can only be seen in the old console. WTF.
+    </section>
+
+    <section>
+        <h2>Elasticsearch Service</h2>
+        The "Require HTTPS" feature for AWS Elasticsearch Service was only announced recently.
+        I guess that explains why it's still poorly documented.
+        whats-new/2019/10/amazon-elasticsearch-service-provides-option-to-mandate-https/
+
+        Each Amazon ES domain resides within its own, dedicated VPC.
+        This architecture prevents potential attackers from intercepting traffic between Elasticsearch nodes.
+        So far so good. Seems reasonable.
+
+        By default, however, traffic within the VPC is unencrypted.
+        Node-to-node encryption enables TLS 1.2 encryption for all communications within the VPC.
+        Okay that's an annoying default. It would be nice if AWS provided a rationale or shared the trade-offs.
+
+        You can require that all traffic to the domain arrive over HTTPS using the console, aws-cli,
+        or configuration API. (I would like to do that. Some details in the docs sure would be nice.)
+
+        By default, domains do not use node-to-node encryption...
+        and you can't configure existing domains to use the feature.
+        To enable the feature, you must create another domain and migrate your data.
+    </section>
+
+    <section>
+        <h2>Kinesis Firehose</h2>
+        Shipping logs with AWS Kinesis Firehose is frustrating. It should be soso simple: receive log events from CloudWatch, write them to S3. Here are the ways in which Firehose is braindead:
+
+        1. Records received from the Kinesis stream are concatenated without any record separator. This means that log messages, coming through as either text or JSON entities, get all jumbled together onto a single line making them nigh unreadable. It would be ideal if the record separator could be defined at configuration time, but alas that is not the case. The suggested workaround is to use a Lambda transform function.
+
+        2. When using an S3 destination with Firehose, the filename and MIME type are dictated based on whether compression is applied after the transform. So if you want the file in S3 to end with .gz and have the correct MIME type for GZip, the only option is to enable post-transform compression (as we are doing). However, this means the protocol for the transform function becomes (input: Compressed) =&gt; output: Raw. That works fine for a while... until you run into the 6 MiB I/O limit for Lambda functions in synchronous execution mode. In this configuration, the input will eventually (perhaps often) be large enough that the output is larger than 6 MiB, so the transform fails and the logs are discarded.
+
+        The only solution that solves all cases is a Lambda transform function that returns data up to 6 MB, then re-enqueues the rest back into the Kinesis/Firehose stream. This is a complex and delicate piece of code, which thankfully AWS is now providing as a Lambda blueprint.
+
+    </section>
+
+    <section>
+        <h2>See Also</h2>
+        <a href="https://github.com/open-guides/og-aws/blob/master/README.md">Open Guide to AWS</a>
+        <!-- TODO: cross-post some lessons to the open guide -->
+    </section>
+
+</main>
+
+<include src="/fragment/footer.html" />
+</body>
+</html>
