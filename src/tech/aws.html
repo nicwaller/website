@@ -108,6 +108,12 @@
         But with an NLB, you get one application per port. THAT'S ALL.
 
         This gets even worse when you start mixing NLB with VPN connections.
+
+        <h3>Even worse with ECS dynamic port mapping</h3>
+        If you want to use an NLB internally between two ECS services,
+        then you're going to run into dynamic port mapping which means you
+        basically need to open up all ports for ingress/egress which
+        eliminates all the good parts of security groups.
     </section>
 
     <section>
@@ -203,6 +209,12 @@
 
         AWS_SDK_LOAD_CONFIG says “hey, use my ~/.aws/config instead of searching for http://169.254.169.254”
         AWS_PROFILE says which profile to load from there
+
+        <h3>Wishlist: over-granted permissions</h3>
+        Google Cloud has this very cool feature that shows a count for each user
+        showing how many of the granted permissions are over-assigned (never used)
+        This would be a super cool feature to have for AWS IAM that would help
+        a lot in supporting least-privilege design.
     </section>
 
     <section>
@@ -247,6 +259,14 @@
         I also ran into this bug with Elastic FileBeat -- it crashed trying to ingest
         compressed files, because it attempted a second round of decompression.
         <!-- TODO: add link to bug report on GitHub -->
+
+        <h2>AWSLogs</h2>
+        All the different possible methods of granting various AWS services the ability to write logs into your S3 bucket:
+        - Create an IAM Role that can be assumed by the origin service and make sure it allows writing into the S3 bucket
+        - Add an entry to the S3 Access Control List that allows an AWS-owned account to use the bucket (only CloudFront needs this)
+        - Add a statement to S3 Bucket Policy that authorizes a specific origin service
+        - Use a canned ACL to provide a special grant (needed for S3 server access logs)
+        To collect logs from a variety of AWS services into one S3 bucket, all of these must be used together.
     </section>
 
     <section>
@@ -321,6 +341,15 @@
             During normal operations it is not unusual to encounter an occasional error from S3.
             <a href="https://forums.aws.amazon.com/message.jspa?messageID=708676#708676">(source)</a>
         </blockquote>
+
+        <h3>40 Gbps</h3>
+        CloudFront is effectively unlimited capacity for most people.
+        If you expect to use more than 40 Gbps bandwidth (combined inbound + outbound)
+        then you'll need to notify AWS Services Team about your planned load.
+
+        More capacity notes:
+        - Every CloudFront distribution is limited to 100,000 requests/second.
+        - Billing is based on total bytes transferred out, so enabling compression can help to reduce costs in some cases.
     </section>
 
     <section>
@@ -356,6 +385,9 @@
         </a>
         and emits metrics to statsd or graphite or datadog or whatever metrics tool you like.
         Heck, you could even send them to CloudWatch.
+
+        <h3>Immutable Tags</h3>
+        Immutable Tags seem like a good idea, but hard to use?
     </section>
 
     <section>
@@ -495,6 +527,39 @@
         A: Yes, by using "Enable raw message delivery" on the SNS topic subscription (only SQS or HTTP)
 
         <h3>No pub</h3>
+    </section>
+
+    <section>
+        <h2>Athena</h2>
+        https://aws.amazon.com/blogs/big-data/top-10-performance-tuning-tips-for-amazon-athena/
+    </section>
+
+    <section>
+        <a id="awslogs" href="#awslogs"><h2>Fragmented AWSLogs</h2></a>
+        At first glance, it might seem like AWS has good support for collecting service logs and
+        piping them to the log system of your choosing. CloudFront, EC2 load balancers, and S3
+        buckets can all be configured to write their logs directly into an S3 bucket, and all
+        use the same <code>AWSLogs</code> prefix and naming convention. Nice!
+
+        But that's where the consistency stops and the pain starts.
+
+        There are dozens of services that can't write their logs to S3. And some of the alternatives
+        within the AWS ecosystem, CloudWatch Logs, SNS, and CloudTrail have even worse adoption.
+
+        For the subset of AWS services that I use as a web developer, I need to use FIVE distinct
+        systems of collecting logs. EventBridge (also called CloudWatch Events) handles around 50%
+        of cases. The exceptions, those missing support for EventBridge, are detailed below grouped
+        by the next-best option.
+
+        <ul>
+            <li>S3 (EC2 load balancer, CloudTrail management events, CloudFront, VPC flow logs, and S3 bucket server access logs)</li>
+            <li>CloudWatch Log Group (Route53 query logs, Lambda invocations, ECS task logs)</li>
+            <li>Email (SNS outputs, Certificate Manager, AWS Trusted Advisor)</li>
+            <li>Kinesis Firehose (AWS WAF)</li>
+        </ul>
+
+        And then of course there's RDS error logs which can't be read from anywhere, other than by
+        manually logging into the Console to read them yourself. Nice.
     </section>
 
     <section>
