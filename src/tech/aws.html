@@ -26,7 +26,17 @@
             <li>CloudFront (globally unique, I think?)</li>
         </ul>
 
-        <!--        TODO: Why use multiple accounts? Exactly why? What worked well? Trade-offs?-->
+        <h3>Limited Blast Radius for Teardowns</h3>
+        If your account has both prod and non-prod resources,
+        and especially if you're using Terraform,
+        there is no way to comfortably (safely) destroy a terraform stack.
+        IAM permissions lack the descriptive power to <mark>fully</mark> isolate resources based on IAM roles,
+        so it's possible that something could go wrong with the destroy operation and spill over into production.
+
+        <h3>Terraform multi-account challenge</h3>
+        Terraform 0.11 (and maybe newer) requires the IAM user running the apply job to be
+        in the same AWS account as the resources that are being terraformed, because some
+        resources are loaded BEFORE the provider role is assumed.
     </section>
 
     <section>
@@ -290,6 +300,27 @@
         Looks like the only way to do this with AWS CloudFront is by using Lambda@Edge.
         https://forums.aws.amazon.com/thread.jspa?threadID=162252
         I still need to investigate the possible impact on performance and reliability.
+
+        <h3>Multiple Distributions</h3>
+        In many scenarios, you're presented with the option of creating multiple CloudFront
+        distributions, or grouping the behaviour all into one big CF distribution.
+        How does one decide which approach is better?
+        <ul>
+            <li>Billing tags are per-distribution.
+                So if you want to do bandwidth chargebacks, you want a unique distribution for every customer.</li>
+        </ul>
+
+        <h3>Lambda@Edge functions are hard to delete</h3>
+        <blockquote>
+            Lambda was unable to delete arn:aws:lambda: … because it is a replicated function.
+            Please see our documentation for Deleting Lambda@Edge Functions and Replicas.
+        </blockquote>
+
+        <h3>Random HTTP 500 errors with S3 origin</h3>
+        <blockquote>
+            During normal operations it is not unusual to encounter an occasional error from S3.
+            <a href="https://forums.aws.amazon.com/message.jspa?messageID=708676#708676">(source)</a>
+        </blockquote>
     </section>
 
     <section>
@@ -303,6 +334,28 @@
         Your services will get nuked without warning, ungracefully.
         The only solution I know of so far is to install a custom Lambda lifecycle event handler. ￼
         https://aws.amazon.com/blogs/compute/how-to-automate-container-instance-draining-in-amazon-ecs/
+
+        <h3>OOM Killer</h3>
+        ECS can easily kill your services and tasks if they surpass the hard memory limit, and
+        if your monitoring is not good, you won't even know. Look for exit code 137 and
+        "OutOfMemoryError: Container killed due to memory usage".
+
+        <h3>Fatality</h3>
+        Any ECS task that exits on its own will emit an event to EventBridge
+        (aka CloudWatch Events) saying that it died, and the event doesn't carry the exit code.
+        Any task that runs outside a service context is expected to exit 0,
+        so you end up with false positive alerts saying that a service died, when it was expected.
+
+        <h3>No metrics on non-service tasks</h3>
+        Only ECS Services get CloudWatch metrics. If you want to know about the memory and CPU
+        usage of a task that runs outside of a service context, you're shit outta luck.
+
+        Workaround: include a sidecar container that polls the
+        <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-metadata-endpoint-v3.html">
+            task metadata endpoint
+        </a>
+        and emits metrics to statsd or graphite or datadog or whatever metrics tool you like.
+        Heck, you could even send them to CloudWatch.
     </section>
 
     <section>
@@ -316,6 +369,16 @@
     </section>
 
     <section>
+        <h2>Kinesis Firehose</h2>
+        <h3>missing newlines</h3>
+        Objects will be dumped into S3 without any delimiters, so if inputs are lines of text
+        or JSON objects, they'll be dumped all in a jumble.
+
+        Workaround: make a processor Lambda function like kinesis-cloudwatch-newline.
+        But beware the 6.00 MiB limit on Lambda response payloads!
+    </section>
+
+    <section>
         <h2>Parameter Store (SSM)</h2>
         The longest value that can be stored in AWS SSM Parameter Store is 4096 bytes.
     </section>
@@ -325,6 +388,26 @@
         Managing AWS API Gateway in AWS Console is still awful.
         API Gateway with Terraform is still unworkable.
         The only half-pleasant experience I've had with API Gateway was with the Serverless framework.
+
+        <h3>HTTPS-only</h3>
+        All APIs created with Amazon API Gateway expose HTTPS endpoints only.
+        Amazon API Gateway does not support unencrypted (HTTP) endpoints.
+        Source: https://aws.amazon.com/api-gateway/faqs/
+
+        So... as long as I'm using API Gateway to front requests,
+        I can't answer with plain HTTP on tcp/80.
+        And some (most?) browsers don't automatically try tcp/443 if tcp/80 fails.
+
+        <h3>Not good for redirects</h3>
+        If you just want to make a super simple HTTP redirect for a vanity domain,
+        API Gateway is way overkill and it's going to hurt you a lot.
+        <a href="https://alestic.com/2015/11/amazon-api-gateway-aws-cli-redirect/">
+            Creating An Amazon API Gateway With aws-cli For Domain Redirect
+        </a>
+
+        Workaround: S3 objects can carry redirect data, which works great if you have
+        a lot of redirects in one domain. Still no great solution if you want to do
+        redirects for a lot of different domains.
     </section>
 
     <section>
@@ -372,13 +455,55 @@
         2. When using an S3 destination with Firehose, the filename and MIME type are dictated based on whether compression is applied after the transform. So if you want the file in S3 to end with .gz and have the correct MIME type for GZip, the only option is to enable post-transform compression (as we are doing). However, this means the protocol for the transform function becomes (input: Compressed) =&gt; output: Raw. That works fine for a while... until you run into the 6 MiB I/O limit for Lambda functions in synchronous execution mode. In this configuration, the input will eventually (perhaps often) be large enough that the output is larger than 6 MiB, so the transform fails and the logs are discarded.
 
         The only solution that solves all cases is a Lambda transform function that returns data up to 6 MB, then re-enqueues the rest back into the Kinesis/Firehose stream. This is a complex and delicate piece of code, which thankfully AWS is now providing as a Lambda blueprint.
+    </section>
 
+    <section>
+        <h2>CloudWatch Alarms</h2>
+        <h3>No dead-man switch</h3>
+        Max alerting window is 24 hours.
+        So you can't make a dead man switch (an alarm that triggers in the absence of activity)
+        if the activity does not reliably occur within any 24 hour window.
+
+        Alternatives: Elastalert? Datadog?
+    </section>
+
+    <section>
+        <h2>Lambda</h2>
+        <h3>Artifact is not run from S3</h3>
+        AWS Lambda does not download a copy of the code from S3 every time a function is executed.
+        Instead, Lambda has its own internal storage that is updated when invoking CreateFunction
+        or UpdateFunctionCode either through the API or the Console.
+        <a href="https://devops.stackexchange.com/a/6512/7770">devops.stackexchange.com</a>
+
+        <h3>6.0 MiB limit on response payload</h3>
+        AWS Lambda has a 6.00 <a href="https://en.wikipedia.org/wiki/Mebibyte">MiB</a> (6.29 MB)
+        limit on size of the response payload for synchronous invocation.
+
+        An additional 100 bytes are granted if your Lambda function returns an object,
+        which brings the limit up to 6291556 bytes.
+
+        This is particularly dangerous when writing a processor for Kinesis Firehose,
+        because the input is compressed but the output must not be compressed.
+
+        <a href="https://github.com/nhnicwaller/aws-lambda-limit">Limit details</a>
+    </section>
+
+    <section>
+        <h2>Simple Notification Service (SNS)</h2>
+        <h3>Raw message delivery</h3>
+        Q: Can messages be forwarded from SNS without extra wrapping or message envelope?<br>
+        A: Yes, by using "Enable raw message delivery" on the SNS topic subscription (only SQS or HTTP)
+
+        <h3>No pub</h3>
     </section>
 
     <section>
         <h2>See Also</h2>
         <a href="https://github.com/open-guides/og-aws/blob/master/README.md">Open Guide to AWS</a>
         <!-- TODO: cross-post some lessons to the open guide -->
+        <a href="https://www.datacenterdynamics.com/en/news/wikileaks-publishes-list-aws-data-center-locations-colo-providers/">
+            WikiLeaks publishes list of AWS data center locations, colo providers
+        </a>
     </section>
 
 </main>
