@@ -2,7 +2,3 @@
   from = "/*"
   to = "/404.html"
   status = 404
-
-[[redirects]]
-  from = "/assets"
-  to = "https://nicwaller-public.s3.us-west-2.amazonaws.com/"

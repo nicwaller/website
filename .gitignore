@@ -1,4 +1,5 @@
-_site
+_site/*
+!_site/_redirects
 node_modules
 .idea/*
 keywords
