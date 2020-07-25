@@ -1,0 +1,1 @@
+- How can I make this content available through Gopher? That's probably not a good idea if my input format is HTML.
