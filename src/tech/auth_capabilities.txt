@@ -1,0 +1,52 @@
+The quality of an authorization system can be evaluated on capabilities (what is possible) and principles (how well the objectives are achieved).
+Capabilities
+Decision Capabilities
+Antecedent Audit
+Consequent Audit
+Policy Administration Capabilities
+Principles
+
+Capabilities
+
+Decision Capabilities
+It returns a policy evaluation (allow/deny).
+It enables a security principal (user) to temporarily impersonate another user (act on behalf of) and assume the exact permissions of that user, along with the limitations of that user. This is especially useful for troubleshooting in systems where policy administrators have been granted much more access than the users they support. Impersonation should be supported by good audit logs.
+It enables a security principal (user) to temporarily change context, such as by assuming a different role or
+It enables a security principal (user) to “Break the Glass” and bypass the authorization scheme for critical emergencies, especially matters of life and death.
+In an Attribute-Based Access Control system there are unlimited options for decision capabilities. A few examples are shown inAugmented Decisions. 
+
+Antecedent Audit
+An authorization system should enable administrators and auditors to test policies and confirm that the access control system produces desired and expected results. It also helps to develop trust that the system can provide the protection the organization requires. Antecedent audit is also referred to as “before the fact” audit. Separation of the PDP (policy decision point) from the PEP (policy enforcement point) is an effective strategy for enabling antecedent audit. Simulation is essential for automated testing.
+Simulation
+It enables administrators to simulate a policy decision using existing policy with any arbitrary security principal and resource object. The resource is not actually fetched or transmitted, and if any audit logs are generated they are clearly identified as simulation.
+It enables administrators to simulate a policy decision using novel policy with any arbitrary security principal and resource object. This is useful for developing and refining access policy.
+It provides administrators with decision metadata during simulation that is sufficient to explain which policies and factors contributed to (were necessary for) the policy decision.
+Enumeration
+It enables administrators to enumerate the resources that are accessible to a chosen security principal, along with information about which actions may be performed on those resources.
+It enables administrators to enumerate the principals that may access a chosen resource object, along with information about which actions may be performed by each principal.
+
+Consequent Audit
+An authorization system should enable administrators to review accesses that have been attempted, regardless of whether the accesses were permitted. This helps to detect improperly configured policies and potential attacks against the access control system. Consequent audit is also known as “after the fact” auditing. This kind of audit requires the continuous generation and storage of audit log events.
+It enables administrators to enumerate all resources a principal has ever accessed, along with what actions were taken.
+It enables administrators to enumerate all principals that have accessed an object, along with what actions were taken.
+It enables users of the system to receive notifications about accesses to chosen resource objects.
+It enables users of the system to review access history of resource objects that have material importance to that user.
+It enables users of the system to enumerate all accessible resources.
+It enables users of the system to be notified that they have been impersonated.
+
+Policy Administration Capabilities
+It enforces constraints on separation of duty.
+Static separation of duty ensures that the the total permission sets associated with two different principals are mutually exclusive (non-overlapping). This is simpler to prove correct.
+Dynamic separation of duty uses attribute-based controls to allow more overlap in permitted actions, but never overlap for any given object. This is relatively harder to verify and prove correct.
+It enables automated generation of policy that can satisfy requirements for a selected principal to access a selected resource object. 
+
+Principles
+Simplicity (the quality of an authorization system is shown by having simple rules that can be used to build complex behaviour. complex rules do not make for a good system. use tables instead of rules, where possible, to make the logic more data-driven and less flexible branching possibilities. clearly delinate between application state and application logic.) A single PEP and single PDP is best.
+Consistency audit log events should have the same shape so they can be processed uniformly.
+Least Privilege (default deny; no opt-out rules present in the system). API routes should have enforcement enabled by default.
+Transparency (we should be able to share our algorithms with auditors; rules should be auditable without reading the program code) We should be able to share our algorithms for authorization with auditors.
+Auditability (audit log events should maybe identify what role or policy granted access; a reasonable number of DENY events should be generated into audit logs).
+Business-Oriented Roles (this is a fundamental part of a RBAC)
+Symmetry Grants can be traced forward and backward
+Audit policy should be defined as part of access policy. The PDP should indicate which accesses should generate audit alerts. (allow/allow-and-alert/deny/deny-and-alert).
+Is the organization a major unit of access control? If so, maybe we should generate audit log events when people move between organizations. Maybe developers should have to assume a role in an organization, rather than having blanket access to so many resources. Which objects are potentially or likely shared among more than one organization, and how is access conferred in those cases?
