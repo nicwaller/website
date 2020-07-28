@@ -2,7 +2,7 @@
 <!--suppress CheckEmptyScriptTag -->
 <html lang="en">
 <head>
-    <title>Authentication & Authorization</title>
+    <title>Models of Authorization</title>
     <include src="/fragment/head.html" />
 </head>
 <body>
@@ -11,8 +11,113 @@
 
 <main>
 
-<!--    TODO: populate this page with my thoughts on authn/authz and formal classification of systems -->
+    <ul>
+        <li>Graph-Based Access Control (GBAC)</li>
+        <li>Attribute-Based Access Control (ABAC)</li>
+        <li>Parameterized Role-Based Access Control (pRBAC)</li>
+        <li>Role-Based Access Control (RBAC)</li>
+        <li>Discretionary Access Control (DAC)</li>
+        <li>Mandatory Access Control (MAC)</li>
+        <li>Multi-Level Security (MLS)</li>
+    </ul>
 
+    <h1>Graph-Based Access Control (GBAC)</h1>
+    Also referred to as “Relationship-Based Access Control” (ReBAC). Graph-based access control is where we allow access to something based on how that data relates to other data. GBAC may be applied in multi-tenant systems with weak separation between tenants (resources may be available to 0 or more tenants).
+
+    Published Standards, Definitions, and Models
+    <ul>
+        <li><a href="https://auth0.com/blog/authorization-series-pt-3-dynamic-authorization-with-graphql-and-rules/">Auth0 - Dynamic Authorization with GraphQL</a></li>
+        <li>http://www.cs.albany.edu/~amir/papers/masoumzadeh2018codaspy.pdf</li>
+    </ul>
+
+    <h1>Attribute-Based Access Control (ABAC)</h1>
+    Policy decisions are based on attributes collected from the subject (security principal), object (resource), and the operating environment. ABAC is often applied in multi-tenant systems with strong separation between tenants (every resource is available to exactly one tenant).
+
+    Pros:
+    <ul>
+        <li>Administration costs are reduced because it is not necessary to define new roles for every department or organization or tenant in the system.</li>
+    </ul>
+
+    Cons:
+    <ul>
+        <li>Policy decision-making may become more complex.</li>
+    </ul>
+
+    It is particularly interesting that before-the-fact audit is inherently challenging in ABAC systems, due in large part to their flexibility. This is a problem that we have already observed.
+
+    <blockquote>
+        Before the fact audit is often necessary to demonstrate compliance to specific regulations or directives. Another commonly desired review feature is determining who has access to a particular object or to the set of resources that are assigned to a particular object attribute. An ABAC system may not lend itself well to conducting these audits efficiently. Rather, a key feature of ABAC is the ability of the object owner to protect and share the object without any prior knowledge of individual subjects. Evaluating the set of subjects that have access to a given object requires a significant data retrieval and computation effort—possibly requiring every object owner to run a simulation of the access control request for every known subject in the enterprise.
+    </blockquote>
+    <a href="https://nvlpubs.nist.gov/nistpubs/specialpublications/NIST.SP.800-162.pdf">NIST SP 800-162 §3.1.2.3</a>
+
+    Published Standards, Definitions, and Models
+    <ul>
+        <li>NIST - Attribute Based Access Control</li>
+        <li>NIST Special Publication 800-162<br>
+            Guide to Attribute Based Access Control (ABAC) Definition and Considerations<br>
+            This is the best document ever.<li>
+    </ul>
+
+    <h1>Parameterized Role-Based Access Control (pRBAC)</h1>
+    In pRBAC, the size of the privilege table grows in proportion to the number of roles, not to the number of security principals. The privilege table expresses relationship between roles and actions.
+
+    Published Standards, Definitions, and Models
+    <ul>
+        <li><a href="https://doi.org/10.1007/0-387-24098-5_17">A Formal Model for Parameterized Role-Based Access Control</a>
+        (full text <a href="https://link.springer.com/content/pdf/10.1007%2F0-387-24098-5_17.pdf">pdf</a>)</li>
+        <li><a href="https://link.springer.com/content/pdf/10.1007%2F0-387-24098-5_17.pdf">A FORMAL MODEL FOR PARAMETERIZED ROLE-BASED ACCESS CONTROL (2004)</a></li>
+        <li><a href="https://doi.org/10.1007/0-387-24098-5_17">https://doi.org/10.1007/0-387-24098-5_17</a></li>
+    </ul>
+    
+    <h1>Role-Based Access Control (RBAC)</h1>
+    
+    Access policy is determined by the system. Where with MAC access is based on subject trust or clearance, with RBAC access is based on the role of the subject. A subject can access an object or execute a function only if their set of permissions—or role—allows it.
+
+    In core RBAC, two users with the same assignment of roles will have identical permissions.
+    
+    Generally speaking, an RBAC system allows composition of multiple roles for a single user.
+    
+    In RBAC there are usually no negative-permission (deny).
+    
+    NIST <a href="https://csrc.nist.gov/CSRC/media/Publications/conference-paper/2000/07/26/the-nist-model-for-role-based-access-control-towards-a-unified-/documents/sandhu-ferraiolo-kuhn-00.pdf">defines</a>
+    four levels of RBAC with increasing capabilities (more detailed inputs). This is also covered by
+    <a href="https://security.stackexchange.com/a/169877/1092">a question on Information Security SE</a>.
+    
+    <ol>
+        <li>
+            <b>Flat</b>. Each user has a list of static roles (no scope or attributes).
+            Each role has a list of static capabilities (action-object tuples). Users can simultaneously exercise permissions of multiple roles.
+        </li>
+        <li>
+            <b>Hierarchical</b>. Roles can be composed to form a hierarchy, with top-level roles having all the permissions of lower-level roles.
+        </li>
+        <li>
+            <b>Constrained</b>. Can enforce rule that selected roles must be mutually exclusive (no overlapping action-object tuples) in order to support business requirement of “separation of duties”.
+        </li>
+        <li>
+            <b>Symmetric</b>. Adds ability to enumerate roles and users that have access to a selected resource.
+        </li>
+    </ol>
+    
+    Published Standards, Definitions, and Models
+    <ul>
+        <li><a href="https://webstore.ansi.org/Standards/INCITS/INCITS3592012R2017?source=blog">ANSI INCITS 359-2012 (R2017) Role Based Access Control</a></li>
+        <li><a href="https://csrc.nist.gov/projects/role-based-access-control">NIST Role-Based Access Control (2013)</a></li>
+        <li><a href="https://csrc.nist.gov/CSRC/media/Publications/conference-paper/2000/07/26/the-nist-model-for-role-based-access-control-towards-a-unified-/documents/sandhu-ferraiolo-kuhn-00.pdf">NIST Model for Role-Based Access Control (2000)</a></li>
+    </ul>
+    
+    <h1>Discretionary Access Control (DAC)</h1>
+    In a system, every object has an owner. With DAC, access control is determined by the owner of the object who decides who will have access and what privileges they will have. Permission management in DAC can be very difficult to maintain; furthermore, DAC does not scale well beyond small sets of users.
+    DAC is usually implemented by associating an Access Control List (ACL) with each resource. The resource owner manages the ACL. Because an ACL is ordered, it lends itself well to including a mix of allow/deny access control entries.
+
+    <h1>Mandatory Access Control (MAC)</h1>
+    Access policy is determined by the system and is implemented by sensitivity labels, which are assigned to each subject and object. A subject's label specifies its level of trust, and an object's label specifies the level of trust that is required to access it. If a subject is to gain access to an object, the subject label must dominate—be at least as high as—the object label.
+
+    <h1>Multi-Level Security (MLS)</h1>
+    Security labels are organized into a
+    <a href="https://en.wikipedia.org/wiki/Total_order">total order</a>
+    (a list from highest to lowest). Subjects (users and processes) are assigned a clearance level. Objects (files and other resources) are also assigned a clearance level. Subjects can only read & write at their defined clearance level, which prevents them from copying data from a high-classified file into a low-classified file.
+    MLS is rarely applied outside military & defence organizations.
 </main>
 
 <include src="/fragment/footer.html" />
