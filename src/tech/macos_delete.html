@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>The User Experience of deleting things on macOS 10.15 "Catalina"</title>
+    <!--suppress CheckEmptyScriptTag -->
+    <include src="/fragment/head.html" />
+</head>
+<body>
+
+<!--suppress CheckEmptyScriptTag -->
+<include src="/fragment/nav.html" />
+
+<main>
+
+    <h1>Case Study: delete confirmation in macOS</h1>
+
+    <p>
+        Since the earliest days of Macintosh OS
+        (<a href="https://www.wired.com/2016/06/apple-os-x-dead-long-live-macos/">now macOS</a>)
+        Apple has placed emphasis on presenting users with a consistent interface and experience.
+        The authoritative reference for designing consistent applications is the
+        <a href="https://developer.apple.com/design/human-interface-guidelines/">Human Interface Guidelines (HIG)</a>
+        published by Apple.
+    </p>
+
+    <p>
+        This page is a case study of one function that is common to many applications: deleting items or records.
+        I will test the behaviour of various applications included with macOS and then classify them into categories.
+        When I observe strange behaviours, I will add notes.
+    </p>
+
+    <section>
+        <h2>Well-Behaved and Fluid</h2>
+        <p>
+            The ideal user experience is created when the application supports the user in being safe,
+            while also reducing friction by getting out of the way as much as possible. This ideal is exemplified
+            by applications that delete items immediately without a prompt, while also making it easy to undo accidental deletions.
+            All of the following applications fit this behaviour:
+        </p>
+
+        <ul>
+            <li>Keynote (delete slide)</li>
+            <li>Calendar (delete event)</li>
+            <li>Finder (delete file)</li>
+            <li>Mail (delete message)</li>
+            <li>Voice Memos (delete memo)</li>
+            <li>Notes (delete note)</li>
+            <li>Preview (delete page)</li>
+            <li>Reminders (delete reminder)</li>
+            <li>Safari (delete bookmark or bookmark folder)</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Well-Behaved, but Mildly Annoying</h2>
+        <p>
+            Some applications add unnecessary friction to the process by displaying a modal sheet to confirm deletion.
+            Well-behaved applications will use the same keyboard shortcuts to confirm or block the delete action.
+            Applications should ideally still support undo, but may instead present warning text that the operation cannot be undone.
+            A modal sheet provides helpful delay when thinking about irreversible operations.
+        </p>
+
+        <table border="1">
+            <tr>
+                <th>Application</th>
+                <th>Operation</th>
+                <th>Esc</th>
+                <th>Cmd-.</th>
+                <th>Return</th>
+                <th>Cmd-Z (undo)</th>
+            </tr>
+            <tr>
+                <td>Calendar</td>
+                <td>delete non-empty calendar</td>
+                <td>Cancel</td>
+                <td>Cancel</td>
+                <td>Delete</td>
+                <td>Restore OK</td>
+            </tr>
+            <tr>
+                <td>Photos</td>
+                <td>delete photo</td>
+                <td>Cancel</td>
+                <td>Cancel</td>
+                <td>Delete</td>
+                <td>Restore OK</td>
+            </tr>
+            <tr>
+                <td>Contacts</td>
+                <td>delete contact</td>
+                <td>Cancel</td>
+                <td>Cancel</td>
+                <td>Delete</td>
+                <td>Restore OK</td>
+            </tr>
+            <tr>
+                <td>Finder</td>
+                <td>empty trash</td>
+                <td>Cancel</td>
+                <td>Cancel</td>
+                <td>Delete</td>
+                <td>cannot undo (as indicated by the modal)</td>
+            </tr>
+            <tr>
+                <td>Mail</td>
+                <td>delete mailbox</td>
+                <td>Cancel</td>
+                <td>Cancel</td>
+                <td>nothing happens</td>
+                <td>cannot undo (as indicated by the modal)</td>
+            </tr>
+        </table>
+
+    </section>
+
+    <section>
+        <h2>No Undo History</h2>
+        <p>
+            Deletions in these applications cannot be un-done.
+            The modal sheet should provide guidance that undo is not possible,
+            but unfortunately it is not mentioned.
+        </p>
+        <ul>
+            <li>News (unfollow a source)</li>
+            <li>Keychain Access (delete an item)</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Inconsistent key bindings</h2>
+        <p>
+            Each of these applications deviates from the normal keybindings in some way.
+        </p>
+        <ul>
+            <li>
+                Messages (delete a conversation). The return key is bound to cancel (instead of delete).
+                The only keybinding to confirm deletion is Cmd-D, which is not used anywhere else.
+            </li>
+            <li>
+                Stocks (delete stock). Return doesn't confirm deletion. Undo is unavailable, but not mentioned.
+            </li>
+            <li>
+                Home (delete a scene). Scenes cannot be selected with the keyboard.
+                Deletion cannot be initiated with the keyboard.
+                The confirmation prompt cannot be accepted or dismissed by the keyboard.
+            </li>
+            <li>
+                Podcasts (remove a podcast)
+                There is no keybinding that will confirm deletion.
+                The return key is bound to cancel instead of delete.
+                The operation cannot be undone, and there is no warning about permanence.
+                All other keyboard events fall through the modal -- for example, pressing
+                the spacebar toggles the play/pause behaviour of the podcast in the parent window.
+            </li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Other</h2>
+        <ul>
+            <li>
+                Notes (delete a folder).
+                The items in the folder are not put back into the folder when the folder is restored.
+                Also, Notes crashed 10 seconds after restoring a deleted item.
+            </li>
+        </ul>
+    </section>
+
+</main>
+
+<!--suppress CheckEmptyScriptTag -->
+<include src="/fragment/footer.html" />
+</body>
+</html>
