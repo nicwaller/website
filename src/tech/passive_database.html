@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<!--suppress CheckEmptyScriptTag -->
+<html lang="en">
+<head>
+    <title>Passive Database</title>
+    <include src="/fragment/head.html" />
+</head>
+<body>
+
+<include src="/fragment/nav.html" />
+
+<h1>Passive Database</h1>
+
+<main>
+
+    <section>
+        <h1>AWS S3 + S3 Select</h1>
+        S3 Select should be promising, right? Nope.
+
+        <table border="1">
+            <tr>
+                <th>Format</th>
+                <th>Row Group Size (#)</th>
+                <th>Rows (#)</th>
+                <th>Dataset (KiB)</th>
+                <th>Result (KiB)</th>
+                <th>Query Tool</th>
+                <th>Query</th>
+                <th>Runtime (s)</th>
+            </tr>
+            <tr>
+                <td>Parquet</td>
+                <td>8192</td>
+                <td>903977</td>
+                <td>28636</td>
+                <td>2457</td>
+                <td>S3 Console</td>
+                <td>* where reachable=true</td>
+                <td>10.5</td>
+            </tr>
+            <tr>
+                <td>Parquet</td>
+                <td>8192</td>
+                <td>903977</td>
+                <td>28636</td>
+                <td>1</td>
+                <td>S3 Console</td>
+                <td>count(*)</td>
+                <td>6.8 ±0.5</td>
+            </tr>
+            <tr>
+                <td>Parquet</td>
+                <td>8192</td>
+                <td>903977</td>
+                <td>28636</td>
+                <td>1</td>
+                <td>S3 Console</td>
+                <td>count(*) where x=200</td>
+                <td>6.8 ±0.5</td>
+            </tr>
+            <tr>
+                <td>Parquet</td>
+                <td>8192</td>
+                <td>861</td>
+                <td>25</td>
+                <td>5</td>
+                <td>S3 Console</td>
+                <td>* where reachable=true</td>
+                <td>0.2</td>
+            </tr>
+            <tr>
+                <td>Parquet</td>
+                <td>8192</td>
+                <td>861</td>
+                <td>25</td>
+                <td>1</td>
+                <td>S3 Console</td>
+                <td>count(*) where reachable=true</td>
+                <td>0.18</td>
+            </tr>
+            <tr>
+                <td>JSON (uncompressed)</td>
+                <td>N/A</td>
+                <td>1403977</td>
+                <td>99100</td>
+                <td>1</td>
+                <td>S3 Console</td>
+                <td>count(*)</td>
+                <td>1.4</td>
+            </tr>
+            <tr>
+                <td>JSON (GZIP)</td>
+                <td>N/A</td>
+                <td>1403977</td>
+                <td>16179</td>
+                <td>1</td>
+                <td>S3 Console</td>
+                <td>count(*)</td>
+                <td>1.0 ±0.2</td>
+            </tr>
+        </table>
+
+        Actually querying raw uncompressed JSON files appears to be about 15x faster than querying Parquet files.
+
+        But I can get a file header (256 KiB) in less than a second anyways.
+
+        <pre><code>
+$ time aws s3api get-object --bucket 'random-surf' --key 'mega/mega.json' --range 'bytes=0-262144' /dev/stdout
+real	0m0.850s
+user	0m0.461s
+sys	0m0.151s
+        </code></pre>
+
+        And in a Lambda function, I can get a whole MB usually in 200-400 ms, with a first-run penalty taking up to 1000 ms.
+    </section>
+
+
+</main>
+
+</body>
+</html>
