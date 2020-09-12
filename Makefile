@@ -23,6 +23,7 @@ forever:
 	fswatch -o src/* | xargs -n1 -I% make _site
 
 serve: _site
+	mkdir -p assets
 	rsync -av assets/ _site/assets/
 	@cd _site && python3 -m http.server 8000
 
