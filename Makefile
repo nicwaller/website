@@ -4,8 +4,9 @@ build: _site
 HTML_SOURCES=$(shell find src -type f -name '*.html')
 HTML_TARGETS=$(patsubst src/%.html, _site/%.html, $(HTML_SOURCES))
 
-_site: $(HTML_TARGETS) src/*.html src/*.css
+_site: $(HTML_TARGETS) src/*.html src/*.css assets
 	rsync -av src/*.css _site/
+	rsync -av assets/ _site/assets/
 
 _site/%.html: src/%.html src/fragment/* transcluder.js node_modules
 	@mkdir -p "$(@D)"
@@ -14,17 +15,20 @@ _site/%.html: src/%.html src/fragment/* transcluder.js node_modules
 node_modules: package.json
 	npm install
 
-.PHONY: assets
-assets:
+.PHONY: upload_assets
+upload_assets:
 	aws s3 sync --acl 'public-read' assets/ s3://nicwaller-public/
+
+assets:
+	mkdir -p assets
+	@# aws s3 sync s3://nicwaller-public/ assets/
+	@# fatal error: An error occurred (AccessDenied) when calling the ListObjectsV2 operation: Access Denied
 
 forever:
 	@#while true; do make build --silent; sleep 1; done
 	fswatch -o src/* | xargs -n1 -I% make _site
 
 serve: _site
-	mkdir -p assets
-	rsync -av assets/ _site/assets/
 	@cd _site && python3 -m http.server 8000
 
 dev:
