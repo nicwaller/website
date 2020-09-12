@@ -5,7 +5,7 @@ HTML_SOURCES=$(shell find src -type f -name '*.html')
 HTML_TARGETS=$(patsubst src/%.html, _site/%.html, $(HTML_SOURCES))
 
 _site: $(HTML_TARGETS) src/*.html src/*.css assets
-	rsync -av src/*.css _site/
+	rsync -av --include='*/' --include='**/*.css' --include='**/*.json' --include='**/*.txt' --exclude='*' src/ _site/
 	rsync -av assets/ _site/assets/
 
 _site/%.html: src/%.html src/fragment/* transcluder.js node_modules
