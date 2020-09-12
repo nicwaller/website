@@ -1,0 +1,78 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "KnowThySelf",
+      "Effect": "Allow",
+      "Action": [
+        "iam:ListUserPolicies",
+        "iam:ListAttachedUserPolicies",
+        "iam:GetUser",
+        "iam:GetLoginProfile",
+        "iam:GenerateServiceLastAccessedDetails"
+      ],
+      "Resource": "arn:aws:iam::123456789123:user/${aws:username}"
+    },
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Action": "iam:GetServiceLastAccessedDetails",
+      "Resource": "*"
+    },
+    {
+      "Sid": "KeepYourFriendsClose",
+      "Effect": "Allow",
+      "Action": "iam:ListUsers",
+      "Resource": "*"
+    },
+    {
+      "Sid": "ManageOwnTOTPVirtualMFA",
+      "Effect": "Allow",
+      "Action": [
+        "iam:ListVirtualMFADevices",
+        "iam:EnableMFADevice",
+        "iam:DeleteVirtualMFADevice",
+        "iam:CreateVirtualMFADevice"
+      ],
+      "Resource": [
+        "arn:aws:iam::123456789123:user/${aws:username}",
+        "arn:aws:iam::123456789123:mfa/${aws:username}"
+      ]
+    },
+    {
+      "Sid": "ManageOwnHardwareMFA",
+      "Effect": "Allow",
+      "Action": [
+        "iam:ResyncMFADevice",
+        "iam:ListMFADevices",
+        "iam:EnableMFADevice",
+        "iam:DeactivateMFADevice"
+      ],
+      "Resource": [
+        "arn:aws:iam::123456789123:user/${aws:username}",
+        "arn:aws:iam::123456789123:mfa/${aws:username}"
+      ]
+    },
+    {
+      "Sid": "ManageOwnAPIAccessKeys",
+      "Effect": "Allow",
+      "Action": [
+        "iam:UpdateAccessKey",
+        "iam:ListAccessKeys",
+        "iam:GetAccessKeyLastUsed",
+        "iam:DeleteAccessKey",
+        "iam:CreateAccessKey"
+      ],
+      "Resource": "arn:aws:iam::123456789123:user/${aws:username}"
+    },
+    {
+      "Sid": "ChangeOwnPassword",
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetAccountPasswordPolicy",
+        "iam:ChangePassword"
+      ],
+      "Resource": "arn:aws:iam::123456789123:user/${aws:username}"
+    }
+  ]
+}

@@ -167,13 +167,13 @@
 
         <h3>Self Control</h3>
         There's no built-in policy that allows users to manage their own MFA, password, etc.
-        <!-- TODO: upload my self-control policy -->
+        <a href="aws-selfcontrol.json">IAM self-control policy (json)</a>
 
         <h3>Read-Only is Dangerous</h3>
         The read-only policy allows read access to contents of all buckets.
         If any of your data is sensitive, you should never grant read-only.
         What you USUALLY want is my structure-viewer policy.
-        <!-- TODO: upload my structure-viewer policy -->
+        <a href="aws-selfcontrol.json">IAM structure-viewer policy (json)</a>
 
         <h3>AssumeRole is awesome</h3>
         AssumeRole changes out your current set of privileges for a different set.
@@ -260,7 +260,9 @@
 
         I also ran into this bug with Elastic FileBeat -- it crashed trying to ingest
         compressed files, because it attempted a second round of decompression.
-        <!-- TODO: add link to bug report on GitHub -->
+        <a href="https://github.com/elastic/beats/issues/18696">
+            Fails processing jsonl+gzip when using S3 Input plugin #18696
+        </a>
 
         <h2>AWSLogs</h2>
         All the different possible methods of granting various AWS services the ability to write logs into your S3 bucket:
