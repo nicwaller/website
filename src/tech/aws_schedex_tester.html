@@ -1,0 +1,107 @@
+<html>
+<head>
+	<title>AWS Schedule Tester</title>
+	<script type="text/javascript">
+minute_regex = /^([*]|([0]?[0-5]?[0-9]?)|(([0]?[0-5]?[0-9]?)(\/|\-)([0]?[0-5]?[0-9]?))|(([0]?[0-5]?[0-9]?)((\,)([0]?[0-5]?[0-9]?))*))$/
+hour_regex = /^([*]|[01]?[0-9]|2[0-3]|(([01]?[0-9]|2[0-3]?)(\/|\-)([01]?[0-9]|2[0-3]?))|(([01]?[0-9]|2[0-3]?)((\,)([01]?[0-9]|2[0-3]?))*))$/
+d_m_regex = /^([*]|[?]|([0-2]?[0-9]|3[0-1])|(([0-2]?[0-9]|3[0-1])(\/|\-)([0-2]?[0-9]|3[0-1]))|(([0-2]?[0-9]|3[0-1])((\,)([0-2]?[0-9]|3[0-1]))*))$/
+month_regex = /^([*]|([0]?[0-9]|1[0-2])|(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)|((([0]?[0-9]|1[0-2])|(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC))(\/|\-)(([0]?[0-9]|1[0-2])|(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)))|((([0]?[0-9]|1[0-2])|(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC))((\,)(([0]?[0-9]|1[0-2])|(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)))*))$/
+d_w_regex = /^([*]|[?]|([0]?[1-7])|(SUN|MON|TUE|WED|THU|FRI|SAT)|((([0]?[1-7])|(SUN|MON|TUE|WED|THU|FRI|SAT))(\/|\-|\,|\#)(([0]?[1-7])|(SUN|MON|TUE|WED|THU|FRI|SAT)))|((([0]?[1-7])|(SUN|MON|TUE|WED|THU|FRI|SAT))((\,)(([0]?[1-7])|(SUN|MON|TUE|WED|THU|FRI|SAT)))*))$/
+year_regex = /^([*]|([1-2][01][0-9][0-9])|(([1-2][01][0-9][0-9])(\/|\-)([1-2][01][0-9][0-9]))|(([1-2][01][0-9][0-9])((\,)([1-2][01][0-9][0-9]))*))$/
+
+function validate_aws_regex(regex_val) {
+	const regex_splits = regex_val.split(" ");
+	if (regex_splits.length < 6) {
+		return Error("Schedule parameter should have 6 field minute,hour,day_of_the_month,month,day_of_the_week,year.Please check the value.")
+	}
+	const minute_val = regex_splits[0]
+	const hour_val = regex_splits[1]
+	const d_m_val = regex_splits[2]
+	const month_val = regex_splits[3]
+	const d_w_val = regex_splits[4]
+	const year_val = regex_splits[5]
+
+	if (!((d_m_val === '?' && d_w_val !== '?') || (d_m_val !== '?' && d_w_val === '?'))) {
+		return Error("Either day-of-month or day-of-week values must be a question mark (?)")
+	}
+
+	if (!minute_val.match(minute_regex)) {
+		return Error("Schedule expression has an invalid minute column value")
+	}
+	if (!hour_val.match(hour_regex)) {
+        return Error("Schedule expression has an invalid hour column value")
+    }
+    if (!d_m_val.match(d_m_regex)) {
+        return Error("Schedule expression has an invalid day of the month column value")
+    }
+    if (!month_val.match(month_regex)) {
+        return Error("Schedule expression has an invalid month column value")
+    }
+    if (!d_w_val.match(d_w_regex)) {
+        return Error("Schedule expression has an invalid day of the week column value")
+    }
+    if (!year_val.match(year_regex)) {
+        return Error("Schedule expression has an invalid year column value")
+    }
+
+    return "OK";
+}
+
+function ready() {
+	const source = document.getElementById('source');
+	const result = document.getElementById('result');
+
+	console.log(source);
+	console.log(result);
+
+	const inputHandler = function(e) {
+	  result.innerHTML = validate_aws_regex(e.target.value);
+	}
+
+	source.addEventListener('input', inputHandler);
+	source.addEventListener('propertychange', inputHandler); // for IE8
+}
+
+    // if '#' in d_w_val:
+    //     nd = int(d_w_val.split('#')[1])
+    //     if nd > 5:
+    //         raise Invalid(
+    //             "Schedule expression has an invalid day of the week column value. Nth day of week cannot be more than 5")
+
+    // current_year = datetime.datetime.today().year
+
+    // year_split_comma_val = year_val.split(",")
+    // year_split_dash_val = year_val.split("-")
+
+    // if "," in year_val:
+    //     if any(yr_val for yr_val in year_split_comma_val if int(yr_val) < current_year):
+    //         raise \
+    //             Invalid("Schedule expression has an invalid year column value. " \
+    //                     "Year value[s] should be greater or equal to %s and less than 2199 " % current_year)
+    // if "-" in year_val:
+    //     if int(year_split_dash_val[1]) < current_year:
+    //         raise \
+    //             Invalid("Schedule expression has an invalid year column value. " \
+    //                     "Year value[s] should be greater or equal to %s and less than 2199 " % current_year)
+
+    // return regex_val
+
+// console.log('test');
+// console.log(validate_aws_regex("foo"));
+
+	</script>
+</head>
+<body>
+
+	<h1>AWS Schedule Expression Tester</h1>
+	
+minute, hour, d/m, month, d/w, year<br>
+<input id="source" value="0 0 0 0 ? 2020">
+<div id="result"></div>
+
+
+<script type="text/javascript">
+	ready();
+</script>
+</body>
+</html>
