@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<!--suppress CheckEmptyScriptTag -->
+<html lang="en">
+<head>
+    <title>Stream Processor</title>
+    <include src="/fragment/head.html" />
+</head>
+<body>
+
+<include src="/fragment/nav.html" />
+
+<main>
+
+    <h1>Stream Management System</h1>
+    An event filtering platform
+    Like strapi but for information flow instead of static content
+    Receive from RabbitMQ or SQS or EventBridge
+    How does this compare to that tool for HL7 events?
+    Visual programming?
+    Tests and filtering
+    Forward events to slack, pagerduty, email, elastic search, SNS, SQS
+    How compare to IFTTT?
+    Like log stash on steroids
+    Event fan-out pipelines
+    Back pressure and high volume?
+    How compare to Riemann?
+    Like a CMS... but for real-time data
+    Logs
+    And business events
+    Integration with Jira? Create issues, or react to issues
+    How to avoid short circuits?? Or at least slow them down.
+    Self hosted so you can easily add your own code
+    Or cloud hosted to get started easily
+    React to events from slack like messages or reactions
+    What about enqueueing future events? Like notify 3 months after hiring? Is this some kind of plugin? How does it relate to deferred work?
+    Real-time first. Visit a page to see real time event stream.
+    Auth0 events
+    Event source dashboard
+    Kinesis underneath? Or as an input? Event replay? What does downtime look like? What is the HA model?
+    Stream processing
+    Duplicate event detection? Deduication?
+    Time dimension? Or just do everything in the moment without temporal context? Create "basins" that collect statistics on events matching a certain user defined pattern. Create metrics on all numerical values.
+    Streaming SQL
+    Sounds like WSO2
+
+    <h2>Analysis</h2>
+    <ul>
+        <li>Audience: DevOps who already like Message Bus/Event-Sourcing</li>
+        <li>Platform: AWS/GCP</li>
+        <li>Competition: Riemann</li>
+    </ul>
+
+</main>
+
+<include src="/fragment/footer.html" />
+</body>
+</html>
