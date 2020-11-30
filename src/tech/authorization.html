@@ -68,21 +68,21 @@
         <li><a href="https://link.springer.com/content/pdf/10.1007%2F0-387-24098-5_17.pdf">A FORMAL MODEL FOR PARAMETERIZED ROLE-BASED ACCESS CONTROL (2004)</a></li>
         <li><a href="https://doi.org/10.1007/0-387-24098-5_17">https://doi.org/10.1007/0-387-24098-5_17</a></li>
     </ul>
-    
+
     <h1>Role-Based Access Control (RBAC)</h1>
-    
+
     Access policy is determined by the system. Where with MAC access is based on subject trust or clearance, with RBAC access is based on the role of the subject. A subject can access an object or execute a function only if their set of permissions—or role—allows it.
 
     In core RBAC, two users with the same assignment of roles will have identical permissions.
-    
+
     Generally speaking, an RBAC system allows composition of multiple roles for a single user.
-    
+
     In RBAC there are usually no negative-permission (deny).
-    
+
     NIST <a href="https://csrc.nist.gov/CSRC/media/Publications/conference-paper/2000/07/26/the-nist-model-for-role-based-access-control-towards-a-unified-/documents/sandhu-ferraiolo-kuhn-00.pdf">defines</a>
     four levels of RBAC with increasing capabilities (more detailed inputs). This is also covered by
     <a href="https://security.stackexchange.com/a/169877/1092">a question on Information Security SE</a>.
-    
+
     <ol>
         <li>
             <b>Flat</b>. Each user has a list of static roles (no scope or attributes).
@@ -98,14 +98,14 @@
             <b>Symmetric</b>. Adds ability to enumerate roles and users that have access to a selected resource.
         </li>
     </ol>
-    
+
     Published Standards, Definitions, and Models
     <ul>
         <li><a href="https://webstore.ansi.org/Standards/INCITS/INCITS3592012R2017?source=blog">ANSI INCITS 359-2012 (R2017) Role Based Access Control</a></li>
         <li><a href="https://csrc.nist.gov/projects/role-based-access-control">NIST Role-Based Access Control (2013)</a></li>
         <li><a href="https://csrc.nist.gov/CSRC/media/Publications/conference-paper/2000/07/26/the-nist-model-for-role-based-access-control-towards-a-unified-/documents/sandhu-ferraiolo-kuhn-00.pdf">NIST Model for Role-Based Access Control (2000)</a></li>
     </ul>
-    
+
     <h1>Discretionary Access Control (DAC)</h1>
     In a system, every object has an owner. With DAC, access control is determined by the owner of the object who decides who will have access and what privileges they will have. Permission management in DAC can be very difficult to maintain; furthermore, DAC does not scale well beyond small sets of users.
     DAC is usually implemented by associating an Access Control List (ACL) with each resource. The resource owner manages the ACL. Because an ACL is ordered, it lends itself well to including a mix of allow/deny access control entries.
@@ -119,6 +119,13 @@
     (a list from highest to lowest). Subjects (users and processes) are assigned a clearance level. Objects (files and other resources) are also assigned a clearance level. Subjects can only read & write at their defined clearance level, which prevents them from copying data from a high-classified file into a low-classified file.
     MLS is rarely applied outside military & defence organizations.
 </main>
+
+<!--
+https://www.npmjs.com/package/accesscontrol
+https://permissions.docs.superawesome.com/additional-documentation/detailed-usage-&-examples.html
+https://www.bloomberg.com/news/articles/2020-07-27/twitter-s-security-woes-included-broad-access-to-user-accounts
+https://www.osohq.com/post/anatomy-of-a-rule
+-->
 
 <include src="/fragment/footer.html" />
 </body>

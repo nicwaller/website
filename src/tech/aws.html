@@ -114,6 +114,9 @@
         then you're going to run into dynamic port mapping which means you
         basically need to open up all ports for ingress/egress which
         eliminates all the good parts of security groups.
+
+        <h3>Mixed up TCP connections</h3>
+        https://news.ycombinator.com/item?id=24856607
     </section>
 
     <section>
@@ -150,6 +153,7 @@
 
     <section>
         <h2>Identity & Access Management (IAM)</h2>
+<!--        linked to my overall interest in access control/infosec -->
         <h3>API keys are insecure by default</h3>
         By default, aws-sdk looks for your API keys in <code>~/.aws/credentials</code>.
         Dangerous! Because ANY process running in your user account can read that file.
@@ -210,13 +214,20 @@
         AWS_SDK_LOAD_CONFIG says “hey, use my ~/.aws/config instead of searching for http://169.254.169.254”
         AWS_PROFILE says which profile to load from there
 
-        <h3>Wishlist: over-granted permissions</h3>
+        <h3>Honing (aka: a wish to remove over-granted permissions)</h3>
         Google Cloud has this very cool feature that shows a count for each user
         showing how many of the granted permissions are over-assigned (never used)
         This would be a super cool feature to have for AWS IAM that would help
         a lot in supporting least-privilege design.
 
         <a href="https://github.com/salesforce/policy_sentry">Policy Sentry</a> - IAM Least Privilege Policy Generator (by Salesforce)
+        via https://twitter.com/kmcquade3/status/1291801872626601994
+
+        https://eng.lyft.com/iam-whatever-you-say-iam-febce59d1e3b
+
+        https://aws.amazon.com/blogs/security/tighten-s3-permissions-iam-users-and-roles-using-access-history-s3-actions/
+
+        https://github.com/salesforce/cloudsplaining
     </section>
 
     <section>
@@ -536,6 +547,11 @@
     <section>
         <h2>Athena</h2>
         https://aws.amazon.com/blogs/big-data/top-10-performance-tuning-tips-for-amazon-athena/
+    </section>
+
+    <section>
+        <h2>Billing</h2>
+        https://chrisshort.net/the-aws-bill-heard-around-the-world/
     </section>
 
     <section>
