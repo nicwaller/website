@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>M1 MacBook Pro review</title>
+    <!--suppress CheckEmptyScriptTag -->
+    <include src="/fragment/head.html" />
+</head>
+<body>
+
+<!--suppress CheckEmptyScriptTag -->
+<include src="/fragment/nav.html" />
+
+<main>
+
+    <h1>My experiences with the 13" M1 MacBook Pro</h1>
+
+    <h2>Keyboard & Trackpad</h2>
+
+    The Fn key in the bottom left has been co-opted to serve a dual purpose in Big Sur. By default it’s an emoji button. I switched it to trigger dictation. 
+
+    The trackpad is too wide, and that makes unwanted inputs more common. I often rest my left hand on the keyboard or the chassis while cursoring. The wider trackpad interprets my palm's contact point as a second finger which prevents the cursor from moving because the trackpad is waiting for a gesture.
+
+    I'm finding drag & drop less reliable on the giant trackpad on this M1 MacBook Pro. The way I usually drag is I'll press and hold with the edge of my thumb, then guide with the index finger. But it seems like this trackpad is picking up my thumb as two separate points sometimes, which locks the cursor in place and makes drag impossible. A workaround is to use two hands, but I've never had to do it like this before.
+
+    I have this annoyance with the 16 inch MacBook Pro and again with this model.
+
+    I understand the M1 MacBook Air has a smaller trackpad, so hopefully it doesn't have the same annoyance.
+
+
+    <h2>Performance</h2>
+
+    This machine is notably faster. Still not “oh shit everything is instantaneous” like the marketing suggests, but yes, it is faster. Copying apps out of a DMG still takes slightly longer than you’d expect, just like it always has.
+
+    Relative to 2015 15" MBP...
+    XCode UI is roughly twice as fast.
+    XCode builds are twice as fast.
+    My AoC solutions are twice as fast. (edited) 
+
+    The instant wake-from-sleep is actually quite impressive. The default settings have a 5 minute grace period for password so you can actually take advantage of instant wake.
+
+
+    <h2>Rosetta 2</h2>
+
+    Slack failed to install from the App Store — it hung at 75%. I had to download it direct instead.
+
+    Things I’ve installed so far that aren’t M1-native:
+
+    <ul>
+        <li>Firefox</li>
+        <li>Spotify</li>
+        <li>Alfred</li>
+        <li>Setapp</li>
+        <li>1Password</li>
+        <li>Webstorm</li>
+        <li>DataGrip</li>
+        <li>TextSniper</li>
+        <li>Paw (edited) </li>
+    </ul>
+
+    Microsoft Office spent like 8 minutes on “scripts” and “registering components” whatever that means.
+
+    Normally app updates are boring, but I love how right now almost every time I download an app update the reason is "Now universal binary for Apple Silicon" and the app is suddenly twice as fast. 
+
+    <h2>Speakers / Sound</h2>
+
+    The speakers are actually really amazingly good. It makes no sense to have sound this good from a tiny 13" laptop.
+
+
+    <h2>macOS 11 "Big Sur"</h2>
+
+    Big Sur doesn’t download all my files from iCloud Drive, and I can’t figure out how to change that behaviour.
+
+    Installing System Extensions (kexts) is much harder in Big Sur than it used to be.
+
+    Audio Crackle when Xcode is open
+
+    I'm getting some very unpleasant audio crackles on this new M1 MacBook Pro. :donotwant:
+Happens with both Music and Spotify. Also, Finder was using 90% CPU so I killed it, but that didn't help. Not sure what's up yet. macOS 11.1.
+
+allegedly this might be related to working in XCode SwiftUI -- which I am doing right now.
+
+
+
+    <h2>Developer Experience</h2>
+
+    Python 3.9.1 was released yesterday and is now built for Apple Silicon. But there’s no pip for Apple Silicon yet. 
+
+    pretty weird error with git here
+
+    nicwaller@MacBook-Pro workspace % git clone git@github.com:nicwaller/advent-of-code-2020.git
+objc[14061]: Class AMSupportURLConnectionDelegate is implemented in both ?? (0x203b5e7a0) and ?? (0x1181b42b8). One of the two will be used. Which one is undefined.
+objc[14061]: Class AMSupportURLSession is implemented in both ?? (0x203b5e7f0) and ?? (0x1181b4308). One of the two will be used. Which one is undefined.
+Cloning into 'advent-of-code-2020'...
+
+
+</main>
+
+<!--suppress CheckEmptyScriptTag -->
+<include src="/fragment/footer.html" />
+</body>
+</html>
