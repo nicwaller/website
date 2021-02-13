@@ -1,1 +1,1 @@
-/assets/* https://nicwaller-public.s3.us-west-2.amazonaws.com/:splat 200!
+/assets/* https://nicwaller-public.s3.us-west-2.amazonaws.com/assets/:splat 200!
