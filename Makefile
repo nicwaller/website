@@ -17,12 +17,11 @@ node_modules: package.json
 
 .PHONY: upload_assets
 upload_assets:
-	aws s3 sync --acl 'public-read' assets/ s3://nicwaller-public/
+	aws s3 sync --acl 'public-read' assets/ s3://nicwaller-public/assets/
 
 assets:
 	mkdir -p assets
-	@# aws s3 sync s3://nicwaller-public/ assets/
-	@# fatal error: An error occurred (AccessDenied) when calling the ListObjectsV2 operation: Access Denied
+	aws s3 sync s3://nicwaller-public/assets/ assets/
 
 forever:
 	@#while true; do make build --silent; sleep 1; done
