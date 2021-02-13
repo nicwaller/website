@@ -21,7 +21,7 @@ upload_assets:
 
 assets:
 	mkdir -p assets
-	aws s3 sync s3://nicwaller-public/assets/ assets/
+	which aws && aws s3 sync s3://nicwaller-public/assets/ assets/
 
 forever:
 	@#while true; do make build --silent; sleep 1; done
