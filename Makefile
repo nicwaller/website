@@ -21,6 +21,9 @@ upload_assets:
 
 assets:
 	mkdir -p assets
+
+.PHONY: download_assets
+download_assets:
 	which aws && aws s3 sync s3://nicwaller-public/assets/ assets/
 
 forever:
